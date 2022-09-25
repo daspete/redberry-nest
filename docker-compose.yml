@@ -1,0 +1,38 @@
+services:
+    mongodb:
+        container_name: mongodb
+        image: mongo:latest
+        restart: always
+        volumes: 
+            - ./data/db:/data/db
+        ports:
+            - 27017:27017
+        networks:
+            - nodenet
+
+    nginx:
+        container_name: nginx
+        image: nginx:latest
+        restart: always
+        ports:
+            - 80:80
+        volumes:
+            - ./nginx:/etc/nginx/templates
+        networks:
+            nodenet:
+                aliases:
+                    - redberry.localhost
+    
+    redberry:
+        container_name: redberry
+        image: node:16
+        working_dir: /var/www
+        volumes:
+            - .:/var/www
+        networks:
+            - nodenet
+        command: bash -c "yarn; yarn start:dev"
+
+networks:
+    nodenet:
+        driver: bridge
